@@ -1,0 +1,42 @@
+import sys
+
+input_sequence1 = sys.argv[1]
+input_sequence2 = sys.argv[2]
+
+alignment = seq(input_sequence1) @ seq(input_sequence2)
+
+alignment_string_sequence_1 = ""
+alignment_string_symbols = ""
+alignment_string_sequence_2 = ""
+
+current_position_sequence_1 = 0
+current_position_sequence_2 = 0
+for cigar_num, cigar_code in alignment.cigar:
+    if(cigar_code == "M"):
+        sequence1 = input_sequence1[current_position_sequence_1:current_position_sequence_1+cigar_num]
+        sequence2 = input_sequence2[current_position_sequence_2:current_position_sequence_2+cigar_num]
+        alignment_string_sequence_1 += sequence1
+        for i in range(len(sequence1)):
+            if(sequence1[i] == sequence2[i]):
+                alignment_string_symbols += "|"
+            else:
+                alignment_string_symbols += "*"
+        #alignment_string_symbols += "|"*cigar_num
+        alignment_string_sequence_2 += sequence2
+        current_position_sequence_1 += cigar_num
+        current_position_sequence_2 += cigar_num
+    elif(cigar_code == "I"):
+        alignment_string_sequence_1 += input_sequence1[current_position_sequence_1:current_position_sequence_1+cigar_num]
+        alignment_string_symbols += "*"*cigar_num
+        alignment_string_sequence_2 += "-"*cigar_num
+        current_position_sequence_1 += cigar_num
+    elif(cigar_code == "D"):
+        alignment_string_sequence_1 += "-"*cigar_num
+        alignment_string_symbols += "*"*cigar_num
+        alignment_string_sequence_2 += input_sequence2[current_position_sequence_2:current_position_sequence_2+cigar_num]
+        current_position_sequence_2 += cigar_num
+
+print alignment.score, alignment.cigar
+print(alignment_string_sequence_1)
+print(alignment_string_symbols)
+print(alignment_string_sequence_2)

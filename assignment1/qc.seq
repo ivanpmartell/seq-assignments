@@ -1,0 +1,47 @@
+import sys
+input_file = sys.argv[1]
+universal_adapters = [k'AGATCGGAAGAG', k'AGATCGGAAGAG']
+
+adapter_fail = 0
+score_fail = 0
+quality_pass = 0
+
+
+is_pair = False
+mate_1 = FASTQRecord('', s'', '')
+for r in FASTQ(input_file):
+    if(is_pair == True):
+        mate_2 = r
+        is_pair = False
+        #QUALITY PROCESS
+        should_break = False
+        for mate in [mate_1, mate_2]:
+            if(should_break):
+                break
+            for kmer in  mate.read.kmers[Kmer[12]]():
+                if(kmer - universal_adapters[0] <= 1):
+                    adapter_fail += 1
+                    should_break = True
+                    break
+                if(kmer - universal_adapters[1] <= 1):
+                    adapter_fail += 1
+                    should_break = True
+                    break
+                quality_sum = 0
+                for i in range(len(mate.qual)):
+                    quality_sum += ord(mate.qual[i]) - 33
+                quality_score = quality_sum / len(mate.qual)
+                if(quality_score < 10):
+                    score_fail += 1
+                    should_break = True
+                    break
+        if not should_break:
+            quality_pass += 1
+        continue
+    mate_1 =r
+    is_pair = True
+
+
+print(f"PASS={quality_pass}")
+print(f"FAIL_ADAPTER={adapter_fail}")
+print(f"FAIL_QUALITY={score_fail}")

@@ -1,0 +1,32 @@
+import os
+import sys
+
+input_file = sys.argv[1]
+output_file1 =  "xmer-1.txt"
+output_file2 = "xmer-2.txt"
+
+kmer_dict = dict[Kmer[10], int]()
+
+for s in FASTA(input_file) |> seqs:
+    for kmer in s.kmers[Kmer[10]]():
+        try:
+            kmer_dict[kmer] += 1
+        except:
+            kmer_dict[kmer] = 1
+
+sorted_kmers = sorted(kmer_dict.keys())
+
+with open(output_file1, 'w') as out_file1:
+    for kmer in sorted_kmers:
+        out_file1.write(str(kmer))
+        out_file1.write(os.linesep)
+
+zipped_lists = zip(kmer_dict.values(), kmer_dict.keys())
+sorted_kmers_by_frequencies = sorted(zipped_lists)
+
+with open(output_file2, 'w') as out_file2:
+    for frequency, kmer in sorted_kmers_by_frequencies:
+        out_file2.write(f"{kmer} {frequency}")
+        out_file2.write(os.linesep)
+
+
