@@ -1,0 +1,2 @@
+#!/bin/bash
+samtools view -h ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00275/alignment/HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.bam 22 > assignment1/data/HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.bam
