@@ -1,0 +1,11 @@
+import sys
+import gzip
+import pickle
+
+input_file = sys.argv[1]
+
+with gzip.open('data/squeeze/file_positions_de_pickled.txt', 'wb') as file_pos:
+    previous_value = 0
+    for r in SAM(input_file):
+        pickle.dump(str(r.pos - previous_value) + "\n", file_pos)
+        previous_value = r.pos

@@ -1,0 +1,9 @@
+import sys
+
+input_file = sys.argv[1]
+
+with open('data/squeeze/file_positions_de.txt', 'w') as file_pos:
+    previous_value = 0
+    for r in SAM(input_file):
+        file_pos.write(str(r.pos - previous_value) + "\n")
+        previous_value = r.pos
