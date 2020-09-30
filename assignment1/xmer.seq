@@ -1,4 +1,3 @@
-import os
 import sys
 
 input_file = sys.argv[1]
@@ -19,7 +18,7 @@ sorted_kmers = sorted(kmer_dict.keys())
 with open(output_file1, 'w') as out_file1:
     for kmer in sorted_kmers:
         out_file1.write(str(kmer))
-        out_file1.write(os.linesep)
+        out_file1.write("\n")
 
 zipped_lists = zip(kmer_dict.values(), kmer_dict.keys())
 sorted_kmers_by_frequencies = sorted(zipped_lists)
@@ -27,6 +26,6 @@ sorted_kmers_by_frequencies = sorted(zipped_lists)
 with open(output_file2, 'w') as out_file2:
     for frequency, kmer in sorted_kmers_by_frequencies:
         out_file2.write(f"{kmer} {frequency}")
-        out_file2.write(os.linesep)
+        out_file2.write("\n")
 
 
