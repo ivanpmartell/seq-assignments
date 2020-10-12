@@ -6,7 +6,7 @@ output_file2 = "xmer-2.txt"
 
 kmer_dict = dict[Kmer[10], int]()
 
-for s in FASTA(input_file) |> seqs:
+for s in FASTA(input_file, fai=False) |> seqs:
     for kmer in s.kmers[Kmer[10]]():
         try:
             kmer_dict[kmer] += 1
@@ -21,7 +21,7 @@ with open(output_file1, 'w') as out_file1:
         out_file1.write("\n")
 
 zipped_lists = zip(kmer_dict.values(), kmer_dict.keys())
-sorted_kmers_by_frequencies = sorted(zipped_lists)
+sorted_kmers_by_frequencies = sorted(zipped_lists, reverse=True)
 
 with open(output_file2, 'w') as out_file2:
     for frequency, kmer in sorted_kmers_by_frequencies:

@@ -47,8 +47,13 @@ while(bits_sequence2 >> bits):
     odd_mask = odd_mask << 2
     odd_mask += 1
 
+print(pretty_binary(bits_sequence1))
+print(pretty_binary(bits_sequence2))
 differences = bits_sequence1 ^ bits_sequence2
+print(pretty_binary(differences))
 compress_even = (differences & even_mask) >> 1
+print(pretty_binary(compress_even))
 compress_odd = (differences & odd_mask) | compress_even
+print(pretty_binary(compress_odd))
 hamming_distance = int.popcnt(compress_odd)
 print(hamming_distance)

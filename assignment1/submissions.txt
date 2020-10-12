@@ -1,0 +1,71 @@
+xmer
+COMPILE OK
+SAMPLE TEST OK
+SCORE: 3/3
+
+OK: Submission 000000022, points: 3
+
+qc
+COMPILE OK
+SAMPLE TEST OK
+SCORE: 3/3
+
+OK: Submission 000000024, points: 3
+
+align
+COMPILE OK
+SAMPLE TEST OK
+SCORE: 6/6
+
+OK: Submission 000000025, points: 6
+
+wheels
+COMPILE OK
+SAMPLE TEST OK
+SCORE: 6/6
+
+OK: Submission 000000033, points: 6
+
+hame
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+
+OK: Your submission ID is 000000089
+
+squeeze DISCUSSION
+The first part of 'squeeze' problem regards to downloading a part of chromosome 22.
+I did this in two ways:
+#!/bin/bash
+cd data/squeeze/
+#Uncompressed way (Get SAM file)
+samtools view -h ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00275/alignment/HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.bam 22 > HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.sam
+#Compressed way (Get BAM file)
+samtools view -o HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.bam --write-index -h ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00275/alignment/HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.bam 22
+
+The problem then asks us to implement a script (1) that reads the file and prints 5 fields.
+And to modify the script to store the fields in a separate file (2)
+This was done with seq code in squeeze.seq file.
+Part 1 is commented out, as we only needed the files for the following procedures in the problem.
+I have attached an image file with the files and their sizes using different techniques.
+The normal text (.txt) documents are the direct results from (2).
+The gunzip files (.txt.gz) are the compressed files with gzip.
+As can be seen, the compressed file sizes drop to only ~15-25% of the original file size with the exception of the quality scores (~50%).
+This might be due to the complexity of the quality scores, where they can't be compressed as effectively because they're not as repetitive as the other files.
+With files that use integers to store data, such as file_positions.txt, a delta encoding can be applied in a straightforward manner.
+The delta encoding (file_positions_de.txt) removes much of the text that has to be saved in the file, and thus compresses the file to a similar size of gzip.
+Further compression of the delta encoding file using gunzip (file_positions_de.txt.gz) yields another drop of file size to only ~25% of the delta encoded file.
+In comparison, using a binary encoding (file_positions_de_pickled.txt) after the delta encoding only drops the file size to ~50% of the original delta encoded file.
+Applying gunzip compression (file_positions_de_pickled.txt.gz) to the binary encoded file yields no further compression benefits.
+Therefore, delta encoding and gunzip (LZ) compression provides the best compression result.
+To further investigate the efficiency of delta encoding + gzip compression, a delta encoding procedure using detools was tested.
+detools requires the use of an original file to use for the creation of a .patch file which contains the differences.
+To test the best case compression, I used the complete SAM file because it should already contain the complete information that file_positions has.
+This was done with the following command:
+detools create_patch HG00275.mapped.ILLUMINA.bwa.FIN.low_coverage.20120522.sam file_positions.txt file_positions.patch
+
+The process took 3 mins and 30 seconds, and the patch file (file_positions.patch) size is ~12.5% of the original file (file_positions.txt).
+This is a significant 1-step compression improvement, but requires the use of the complete SAM file to uncompress (Uncompression takes less than half a second), while still being slightly larger than delta encoding + gzip compression.
+The delta encoding and pickling is done in seq language in the following files:
+squeeze_delta_encoding.seq
+squeeze_delta_encoding_pickled.seq
