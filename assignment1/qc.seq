@@ -1,3 +1,4 @@
+## V00884733 qc
 import sys
 input_file = sys.argv[1]
 universal_adapters = [k'AGATCGGAAGAG', ~k'AGATCGGAAGAG']

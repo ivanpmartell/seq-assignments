@@ -1,59 +1,29 @@
+## V00884733 hame
 import sys
 
 input_sequence1 = sys.argv[1]
 input_sequence2 = sys.argv[2]
 
-bit_dict = {'A': '00',
-            'C': '01',
-            'G': '10',
-            'T': '11'}
+bit_dict = {'A': 0,
+            'C': 1,
+            'G': 2,
+            'T': 3}
 
 def bit_representation(sequence):
-    bits_representation_sequence = ''
-    for c in sequence:
-        bits_representation_sequence += bit_dict[c.upper()]
-    return bits_representation_sequence
+    bits = 0
+    for i in range(len(sequence)):
+        bits = bits << 2
+        bits |= bit_dict[sequence[i]]
+    return bits
 
-def recursive_binary(number):
-        if(number == 0):
-            return  ''
-        else:
-            return recursive_binary(number // 2) + str(number % 2)
+bits_sequence1 = bit_representation(input_sequence1)
+bits_sequence2 = bit_representation(input_sequence2)
 
-def pretty_binary(number):
-    result = recursive_binary(number)
-    while (len(result) < len(input_sequence1)*2-1):
-        result = '00' + result
-    if (len(result) % 2 != 0):
-        return '0' + result
-    else:
-        return result
-    
+odd_mask = 6148914691236517205
+even_mask = 12297829382473034410
 
-bits_sequence1 = int(bit_representation(input_sequence1), 2)
-bits_sequence2 = int(bit_representation(input_sequence2), 2)
-
-#print(pretty_binary(bits_sequence1 | bits_sequence2))
-#int.popcnt(bits_sequence1 & bits_sequence2)
-odd_mask = 1
-even_mask = 2
-
-bits = 0
-while(bits_sequence2 >> bits):
-    bits += 2
-    even_mask = even_mask << 1
-    even_mask += 1
-    even_mask = even_mask << 1
-    odd_mask = odd_mask << 2
-    odd_mask += 1
-
-print(pretty_binary(bits_sequence1))
-print(pretty_binary(bits_sequence2))
 differences = bits_sequence1 ^ bits_sequence2
-print(pretty_binary(differences))
 compress_even = (differences & even_mask) >> 1
-print(pretty_binary(compress_even))
 compress_odd = (differences & odd_mask) | compress_even
-print(pretty_binary(compress_odd))
 hamming_distance = int.popcnt(compress_odd)
 print(hamming_distance)

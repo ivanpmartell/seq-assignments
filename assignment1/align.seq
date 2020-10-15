@@ -1,3 +1,4 @@
+## V00884733 align
 import sys
 
 input_sequence1 = sys.argv[1]
