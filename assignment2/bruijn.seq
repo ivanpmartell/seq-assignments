@@ -1,0 +1,30 @@
+import python
+import sys
+
+pydef graphviz(edges: dict[str, tuple[str, dict[str, int]]]()):
+    import graphviz
+    g = graphviz.Digraph(format='png')
+    for src, dst in edges.items():
+        for i in range(dst[1]['w']):
+            g.edge(src, dst[0])
+        g.render('bruijn')
+
+input_file = sys.argv[1]
+
+kmer_dict = dict[str, int]()
+for r in FASTA(input_file, fai=False):
+    name = r.name
+    s = r.seq
+    kmers = s.kmers[Kmer[12]](1)
+    for kmer in kmers:
+        kmer_str = str(kmer)
+        try:
+            kmer_dict[kmer_str] += 1
+        except:
+            kmer_dict[kmer_str] = 1
+edges = dict[str, tuple[str, dict[str, int]]]()
+for kmer, weight in kmer_dict.items():
+    source = kmer[:-1]
+    destination = kmer[1:]
+    edges[source] = (destination, {"w": weight})
+graphviz(edges)
