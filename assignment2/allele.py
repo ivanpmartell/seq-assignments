@@ -1,0 +1,65 @@
+import sys
+
+reference_file = sys.argv[1]
+sam_file = sys.argv[2]
+
+ref = ""
+ref_name = ""
+for r in FASTA(reference_file, fai=False):
+    ref_name = r.name
+    ref = str(r.seq).upper()
+
+positions_dict = dict[int, dict[str, int]]() # position -> nucleotide, count
+for line in SAM(sam_file):
+    ref_start = line.pos
+    read, read_start = str(line.seq), 0
+    for sz, op in line.cigar:
+        match op:
+            case 'M' or '=' or 'X':
+                current_ref = ref[ref_start:ref_start + sz]
+                current_read = read[read_start:read_start + sz]
+                for i in range(len(current_ref)):
+                    try:
+                        positions_dict[ref_start+i][current_read[i]] += 1
+                    except:
+                        try:
+                            positions_dict[ref_start+i][current_read[i]] = 1
+                        except:
+                            positions_dict[ref_start+i] = {current_read[i]: 1}
+                            positions_dict[ref_start+i][f'ref_{current_ref[i]}'] = 1
+            case 'I' or 'S':
+                read_start += sz
+            case 'D' or 'N':
+                ref_start += sz
+            case _:
+                pass
+
+results = list[tuple[int,str]]()
+for pos, base in positions_dict.items():
+    ref_nucleotide = ""
+    read_counts = list[tuple[str, int]]()
+    total_counts = 0
+    for nucleotide, count in base.items():
+        if nucleotide.startswith('ref'):
+            ref_nucleotide = nucleotide.split('_')[1]
+        else:
+            read_counts.append((nucleotide, count))
+            total_counts += count
+    assert ref_nucleotide != ""
+    possible_heterozygous = list[str]()
+    for nucleotide, count in read_counts:
+        if nucleotide != ref_nucleotide:
+            if (count/total_counts) > .8:
+                #homozygous
+                results.append((pos+1, f"HOM {nucleotide}/{nucleotide}"))
+                break
+        if (count/total_counts) > .4:
+            #possible heterozygous
+            if len(possible_heterozygous) > 0:
+                possible_heterozygous.append(nucleotide)
+                results.append((pos+1, f"HET {possible_heterozygous[1]}/{possible_heterozygous[0]}"))
+                break
+            possible_heterozygous.append(nucleotide)
+sorted_results = sorted(results)
+for result in sorted_results:
+    print(f"{ref_name} {result[0]} {result[1]}")
