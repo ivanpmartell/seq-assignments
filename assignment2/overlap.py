@@ -1,0 +1,33 @@
+import python
+import sys
+
+def overlap(a, b):
+    return max(i for i in range(len(b)+1) if a.endswith(b[:i]))
+
+pydef graphviz(edges: list[tuple[str, str, dict[str, int]]]):
+    import graphviz
+    g = graphviz.Digraph(format='png')
+    for edge in edges:
+        g.edge(edge[0], edge[1], label=str(edge[2]['o']))
+        g.render('overlap')
+
+input_file = sys.argv[1]
+
+reads = list[str]()
+for r in FASTA(input_file, fai=False):
+    read_str = str(r.seq)
+    reads.append(read_str)
+
+edges = list[tuple[str, str, dict[str, int]]]()
+for i in range(len(reads)):
+    for j in range(i+1, len(reads)):
+        source = reads[i]
+        destination = reads[j]
+        ol = overlap(source, destination)
+        if ol > 10:
+            edges.append((source, destination, {"o": ol}))
+        ol = overlap(destination, source)
+        if ol > 10:
+            edges.append((destination, source, {"o": ol}))
+
+graphviz(edges)
