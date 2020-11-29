@@ -1,0 +1,65 @@
+Explanations and bonuses at bottom
+## V00884733 orcom
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000883
+
+## V00884733 semi
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000884
+
+## V00884733 bruijn
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000885
+
+## V00884733 euler
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000882
+
+## V00884733 overlap
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000886
+
+## V00884733 allele
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000887
+
+## V00884733 bloom
+COMPILE OK
+SAMPLE TEST OK
+PASSED SAMPLE TEST
+OK: Your submission ID is 000000894
+
+###Extra explanations and bonuses
+## euler
+For the euler problem, I first decided to go with a comprehensive approach where all possible DFS traversales of the graph
+were searched (euler_long.seq), but this proved to be too time consuming. Therefore I then opted to do a depth limitied DFS
+algorithm (commented euler.seq), but that also took around 30 seconds, and increased memory. The final approach was to select
+at random an edge were there was a fork in the graph (submitted euler.seq), which was extremely fast and gave satisfactory
+results. The alignments obtained from blast with one of my outputs is given as a text file (W6PMW7U1013-Alignment.txt), which
+all point to SARS-CoV-2.
+##
+## bloom
+For the bloom problem, the bonus for different optimal parameters are either used or commented in the bloom.seq file. The formula
+for the optimal hashing functions was obtained from https://www.mdpi.com/2079-9292/8/7/779/htm equation 1 and was implemented in
+the function `best_hashing`. This formula can also be rewritten to find the optimal size of the bloom filter array using simple
+algebraic manipulation which can be seen in function `best_size_from_k`. The false positive probability of the bloom filter was
+obtained from https://books.google.ca/books?id=0bAYl6d7hvkC&pg=PA110 and substituting k for equation 1 and simplifying it gives
+us the formula for the optimal size of the bloom filter array which was implemented in function `best_size`.
+From experiments, I found that with this data it was best to have a probability around 0.5 and approximating n to 2 million entries.
+The real amount of entries into the bloom filter is very close to 2 million and thus it gives a very good approximation. When changing
+the probability too low (<0.05), the algorithm requires more time, and it also does not give very good approximations as the amount of
+hashing also increases. This might be happening because of the seeds I'm using which are consecutive numbers [0...k]. For a probability
+that is too high (>0.95), the algorithm is very fast but much more inaccurate, with plenty of collisions.
+##

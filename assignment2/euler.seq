@@ -1,0 +1,132 @@
+## V00884733 euler
+# The assembled contig is a genome of SARS-CoV-2
+import sys
+import random
+
+class Graph:
+    starts: list[str]
+    edges: dict[str, list[tuple[str, dict[str, int]]]]
+    visited: dict[str, int]
+    visited_copy: dict[str, int]
+    global_count: int
+    max_depth: int
+    current_depth: int
+    def __init__(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], destinations: dict[str, bool]):
+        self.starts = list[str]()
+        self.visited = dict[str, int]()
+        self.max_depth = 50
+        for src, dest in edges.items():
+            self.visited[src] = 0
+            for d in dest:
+                self.visited[d[0]] = 0
+            try:
+                destinations[src]
+            except:
+                self.starts.append(src)
+        if len(self.starts) == 0:
+            self.starts = list(edges.keys())
+        self.edges = edges
+        self.global_count = 0
+    
+    #might have an error when v is not the child that gives the count of 1
+    def count_children(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str):
+        count = 0
+        try:
+            for n in edges[u]:
+                count += n[1]['w']
+        except:
+            pass
+        return count
+    
+    def is_visited(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str, v: str):
+        for child in edges[u]:
+            if child[0] == v:
+                return False if child[1]['w'] > 0 else True
+
+    def remove_edge(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str, v: str):
+        try:
+            for child in edges[u]:
+                if child[0] == v:
+                    child[1]['w'] -= 1
+        except:
+            pass
+    
+    def visit_node(self: Graph, u: str):
+        self.visited_copy[u] += 1
+
+    def add_edge(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str, v: str):
+        for child in edges[u]:
+            if child[0] == v:
+                child[1]['w'] += 1
+    
+    def DFSCount(self: Graph, edges: list[tuple[str, dict[str, int]]], v: str, previous: str): 
+        count = 1
+        self.current_depth += 1
+        if self.current_depth > self.max_depth:
+            return count
+        self.visit_node(previous)
+        for i in edges: 
+            if i[1]['w'] > self.visited_copy[i[0]]:
+                try:
+                    next_edges = self.edges[i[0]]
+                    count = count + self.DFSCount(next_edges, i[0], v)
+                except:
+                    continue
+        return count
+
+    def printEulerUtil(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str): 
+        contig = u[-1]
+        try:
+            edges[u]
+        except:
+            return contig
+        #counts = dict[int, str]()
+        children = list[str]()
+        for idx, v in enumerate(edges[u]):
+            if v[1]['w'] > 0:
+                #self.visited_copy = self.visited.copy()
+                #self.current_depth = 1
+                #temp = self.DFSCount(edges[u], v[0], u)
+                children.append(v[0]) #counts[temp] = v[0]
+        if len(children) == 0: #if len(counts) == 0:
+            return contig
+        best_child = random.choice(children)#counts[max(list(counts.keys()))]
+        self.remove_edge(edges, u, best_child)
+        contig += self.printEulerUtil(edges, best_child)
+        return contig
+    
+    def get_longest_contig(self: Graph):
+        longest_contig = ''
+        for start in self.starts:
+            current_edges = self.edges.copy()
+            sequence = start[:-1]
+            sequence += self.printEulerUtil(current_edges, start)
+            if len(longest_contig) < len(sequence):
+                longest_contig = sequence
+        return longest_contig
+
+input_file = sys.argv[1]
+
+kmer_dict = dict[str, int]()
+for r in FASTA(input_file, fai=False):
+    name = r.name
+    s = r.seq
+    kmers = s.kmers[Kmer[12]](1)
+    for kmer in kmers:
+        kmer_str = str(kmer)
+        try:
+            kmer_dict[kmer_str] += 1
+        except:
+            kmer_dict[kmer_str] = 1
+edges = dict[str, list[tuple[str, dict[str, int]]]]()
+destinations = dict[str, bool]()
+for kmer, weight in kmer_dict.items():
+    source = kmer[:-1]
+    destination = kmer[1:]
+    try:
+        edges[source].append((destination, {"w": weight}))
+    except:
+        edges[source] = [(destination, {"w": weight})]
+    destinations[destination] = True
+debruijn = Graph(edges, destinations)
+print(debruijn.get_longest_contig())

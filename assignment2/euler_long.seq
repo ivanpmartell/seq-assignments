@@ -1,0 +1,98 @@
+## V00884733 euler
+# The assembled contig is a genome of SARS-CoV-2 Accession:MT263145.1
+import sys
+
+class Graph:
+    starts: list[str]
+    edges: dict[str, list[tuple[str, dict[str, int]]]]
+    path: list[str]
+    longest_path: str
+    def __init__(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], destinations: dict[str, bool]):
+        self.starts = list[str]()
+        self.longest_path = ""
+        for src, dest in edges.items():
+            try:
+                destinations[src]
+            except:
+                self.starts.append(src)
+        if len(self.starts) == 0:
+            self.starts = list(edges.keys())
+        self.edges = edges
+
+    def remove_edge(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str, v: str):
+        try:
+            for child in edges[u]:
+                if child[0] == v:
+                    child[1]['w'] -= 1
+        except:
+            pass
+    
+    def add_edge(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str, v: str):
+        for child in edges[u]:
+            if child[0] == v:
+                child[1]['w'] += 1
+    
+    def DFSCount(self: Graph, edges: dict[str, list[tuple[str, dict[str, int]]]], u: str): 
+        self.path.append(u[-1])
+        try:
+            for v in edges[u]:
+                if v[1]['w'] > 0:
+                    self.remove_edge(edges, u, v[0])
+                    self.DFSCount(edges, v[0])
+                    self.add_edge(edges, u, v[0])
+                else:
+                    current_path = "".join(self.path)
+                    #print(current_path)
+                    if len(self.longest_path) < len(current_path):
+                        self.longest_path = current_path
+        except:
+            current_path = "".join(self.path)
+            #print(current_path)
+            if len(self.longest_path) < len(current_path):
+                self.longest_path = current_path
+        self.path.pop()
+    
+    def longest_string(self: Graph):
+        longest_string = ""
+        for sequence in self.dfs_paths:
+            if len(longest_string) < len(sequence):
+                print(sequence)
+                longest_string = sequence
+        return longest_string
+    
+    def get_longest_contig(self: Graph):
+        for start in self.starts:
+            current_edges = self.edges.copy()
+            sequence = start[:-1]
+            self.path = list[str]()
+            for letter in sequence:
+                self.path.append(letter)
+            print(start)
+            self.DFSCount(current_edges, start)
+        return self.longest_path
+
+input_file = sys.argv[1]
+
+kmer_dict = dict[str, int]()
+for r in FASTA(input_file, fai=False):
+    name = r.name
+    s = r.seq
+    kmers = s.kmers[Kmer[12]](1)
+    for kmer in kmers:
+        kmer_str = str(kmer)
+        try:
+            kmer_dict[kmer_str] = 1
+        except:
+            kmer_dict[kmer_str] = 1
+edges = dict[str, list[tuple[str, dict[str, int]]]]()
+destinations = dict[str, bool]()
+for kmer, weight in kmer_dict.items():
+    source = kmer[:-1]
+    destination = kmer[1:]
+    try:
+        edges[source].append((destination, {"w": weight}))
+    except:
+        edges[source] = [(destination, {"w": weight})]
+    destinations[destination] = True
+debruijn = Graph(edges, destinations)
+print(debruijn.get_longest_contig())

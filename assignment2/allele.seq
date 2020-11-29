@@ -1,3 +1,4 @@
+## V00884733 allele
 import sys
 
 reference_file = sys.argv[1]
@@ -57,7 +58,8 @@ for pos, base in positions_dict.items():
             #possible heterozygous
             if len(possible_heterozygous) > 0:
                 possible_heterozygous.append(nucleotide)
-                results.append((pos+1, f"HET {possible_heterozygous[1]}/{possible_heterozygous[0]}"))
+                sorted_heterozygous = sorted(possible_heterozygous)
+                results.append((pos+1, f"HET {sorted_heterozygous[0]}/{sorted_heterozygous[1]}"))
                 break
             possible_heterozygous.append(nucleotide)
 sorted_results = sorted(results)

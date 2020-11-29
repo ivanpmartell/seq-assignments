@@ -1,0 +1,61 @@
+## V00884733 bloom
+import sys
+import math
+
+def MurmurHash64A(k,l,seed):
+    m = 0xc6a4a7935bd1e995
+    r = 47
+    h = seed ^ (l * m)
+
+    data = int(k.as_int())
+
+    #inside of while
+    kk = data
+    
+    kk *= m
+    kk ^= kk >> r
+    kk *= m
+    
+    h ^= kk
+    h *= m
+
+    h *= m
+    h ^= h >> r
+    h *= m
+    h ^= h >> r
+    return h
+
+def best_size(n: int, p: float):
+    return int(-(n*math.log(p))/math.pow(math.log(2.0),2.0))
+
+def best_size_from_k(k: int, n:int):
+    return int(k*n/math.log(2.0))
+
+def best_hashing(n: int, m: int):
+    return int((m/n)*math.log(2.0))
+
+input_file = sys.argv[1]
+threshold = sys.argv[2]
+length = 8 #from pdf
+h = 3 #from pdf
+n = 2000000 #estimated number of kmers
+m = best_size_from_k(h, n)
+#m = best_size(n, 0.9)
+#h = max(1,best_hashing(n, m))
+bloom_filter = [0 for i in range(m)]
+#print(f"Estimated size: {m}")
+#print(f"Estimated amount of hashing functions: {h}")
+
+for r in FASTA(input_file, fai=False):
+    s = r.seq
+    kmers = s.kmers[Kmer[20]](1)
+    kmers_over_threshold = dict[Kmer[20], int]()
+    for k in kmers:
+        for i in range(h):
+            index = MurmurHash64A(k, length, i) % len(bloom_filter)    
+            bloom_filter[index] += 1
+            if bloom_filter[index] > int(threshold):
+                kmers_over_threshold[k] = bloom_filter[index]
+    for kmer, count in kmers_over_threshold.items():
+        print(f"{count} {kmer}")
+        
